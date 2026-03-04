@@ -17,6 +17,9 @@ add_executable(Lab1
   file.h file.cpp
   filemanager.h filemanager.cpp
   logger.h logger.cpp
+
+
+
 )
 target_link_libraries(Lab1 PRIVATE Qt${QT_VERSION_MAJOR}::Core)
 

@@ -1,4 +1,5 @@
 #include <QCoreApplication>
+#include "filemanager.h"
 
 int main(int argc, char *argv[])
 {
@@ -14,6 +15,10 @@ int main(int argc, char *argv[])
 
     // If you do not need a running Qt event loop, remove the call
     // to a.exec() or use the Non-Qt Plain C++ Application template.
+
+    fileManager& manager = fileManager::Instance();
+    manager.addFile("/Users/nikitabufalov/work2/Soft_development/Lab1/file1.txt");
+    manager.addFile("/Users/nikitabufalov/work2/Soft_development/Lab1/file2.txt");
 
     return a.exec();
 }

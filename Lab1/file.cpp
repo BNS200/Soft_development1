@@ -1,27 +1,27 @@
 #include "file.h"
 
-file::file(QString& filePath, QObject* parent)
+File::File(const QString& filePath, QObject* parent)
     : QObject(parent), fileSize(0), fileName("unnamed"), pathToFile(filePath), exists(false)
 {
     update();
 }
 
-QString file::getFilePath(){
+QString File::getFilePath(){
     return pathToFile;
 }
 
-size_t file::getSize(){
+qint64 File::getSize(){
     return fileSize;
 }
 
-bool file::getStatus(){
+bool File::getStatus(){
     return exists;
 }
 
-void file::update(){
+void File::update(){
     QFileInfo fileInfo(pathToFile);
     bool existed = exists;
-    size_t wasSize = fileSize;
+    qint64 wasSize = fileSize;
 
     exists = fileInfo.exists();
 
@@ -35,14 +35,14 @@ void file::update(){
     check(existed, wasSize);
 }
 
-void file::check(bool existed, size_t size){
+void File::check(bool existed, qint64 size){
     if (!existed && exists){
         emit fileCreated(pathToFile, fileSize);
         emit fileExists(pathToFile, fileSize);
     }
     else if (existed && !exists){
         emit fileDeleted(pathToFile);
-        emit fileNotExist(pathToFile);
+        emit fileNotExists(pathToFile);
 
     }
     else if (existed && exists){
@@ -54,8 +54,6 @@ void file::check(bool existed, size_t size){
         }
     }
     else if (!existed && !exists){
-        emit fileNotExists(fileSize);
+        emit fileNotExists(pathToFile);
     }
-
-
 }

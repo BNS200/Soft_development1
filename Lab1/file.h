@@ -4,19 +4,19 @@
 #include <QString>
 #include <QFileInfo>
 #include <QDateTime>
-#include <QObject>
+#include <memory>
 
 
-class file : public QObject
+class File : public QObject
 {
+
+    Q_OBJECT;
 public:
-    file(QString& pathToFile, QObject* parent = nullptr);
+    explicit File(const QString& pathToFile, QObject* parent = nullptr);
     bool getStatus();
-    size_t getSize();
+    qint64 getSize();
     QString getFilePath();
     void update();
-
-
 
 private:
     size_t fileSize;
@@ -27,19 +27,16 @@ private:
 
     QDateTime modified;
 
-    void check(bool existed, size_t size);
+    void check(bool existed, qint64 size);
 
 signals:
-    void fileCreated(const QString& fileName, size_t size);
-    void fileChanged(const QString& fileName,size_t size);
+    void fileCreated(const QString& fileName, qint64 size);
+    void fileChanged(const QString& fileName,qint64 size);
     void fileDeleted(const QString& fileName);
     void fileNotExists(const QString& fileName);
-    void fileExists(const QString& fileName, size_t size);
-
-
-
-
-
+    void fileExists(const QString& fileName, qint64 size);
 };
+
+//QFileInfo::size -> qint64
 
 #endif // FILE_H
