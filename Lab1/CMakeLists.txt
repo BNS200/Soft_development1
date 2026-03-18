@@ -14,9 +14,10 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core)
 
 add_executable(Lab1
   main.cpp
-  file.h file.cpp
+
   filemanager.h filemanager.cpp
   logger.h logger.cpp
+
 
 
 

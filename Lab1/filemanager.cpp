@@ -1,48 +1,90 @@
 #include "filemanager.h"
 
-fileManager::fileManager(QObject* parent) : QObject(parent){
-    log = new logger(this);
+fileManager::fileManager(QObject* parent) : QObject(parent), log(nullptr)
+{
 
-    timer = new QTimer(this);
-
-    connect(timer, &QTimer::timeout, this, &fileManager::updateFiles);
-    timer->start(100);
 }
 
-fileManager& fileManager::Instance(){
-    static fileManager f;
-    return f;
+fileManager& fileManager::Instance()
+{
+    static fileManager instance;
+    return instance;
 }
 
-void fileManager::updateFiles(){
-    for (auto& file : files){
-        file->update();
+fileManager::~fileManager()
+{
+
+}
+
+void fileManager::setLogger(logger* logValue){
+    log = logValue;
+
+    if (log) {
+        connect(this, &fileManager::fileCreated, log, &logger::logCreated);
+        connect(this, &fileManager::fileChanged, log, &logger::logChanged);
+        connect(this, &fileManager::fileDeleted, log, &logger::logDeleted);
+        connect(this, &fileManager::fileExists, log, &logger::logExists);
+        connect(this, &fileManager::fileNotExists, log, &logger::logNotExists);
+    } else {
+        qDebug() << "Logger is null";
+        return;
     }
 }
 
-fileManager::~fileManager(){
-    timer->stop();
+
+void fileManager::addFile(const QString& filePath)
+{
+
+    for (int i = 0; i < files.size(); ++i) {
+        if (files[i].filePath() == filePath) {
+            return;
+        }
+    }
+    files.append(QFileInfo(filePath));
 }
 
-void fileManager::addFile(const QString& filePath){
-    std::shared_ptr<File> file = std::make_shared<File>(QString(filePath));
-    setConnection(file);
-    files.append(file);
-}
-
-void fileManager::removeFile(const QString& filePath){
-    for (int i = 0; i < files.size(); ++i){
-        if (files[i]->getFilePath() == filePath){
+void fileManager::removeFile(const QString& filePath)
+{
+    for (int i = 0; i < files.size(); ++i) {
+        if (files[i].filePath() == filePath) {
             files.removeAt(i);
             break;
         }
     }
 }
 
-void fileManager::setConnection(std::shared_ptr<File> file){
-    connect(file.get(), &File::fileCreated, log, &logger::logCreated);
-    connect(file.get(), &File::fileDeleted, log, &logger::logDeleted);
-    connect(file.get(), &File::fileExists, log, &logger::logExists);
-    connect(file.get(), &File::fileNotExists, log, &logger::logNotExists);
-    connect(file.get(), &File::fileChanged, log, &logger::logChanged);
+void fileManager::updateFiles()
+{
+
+    if (!log)
+        return;
+    for (int i = 0; i < files.size(); ++i) {
+        QFileInfo oldInfo = files[i];
+        QString filePath = oldInfo.filePath();
+        QFileInfo newInfo(filePath);
+
+        bool oldExists = oldInfo.exists();
+        bool newExists = newInfo.exists();
+
+        if (!oldExists && newExists) {
+            files[i] = newInfo;
+            emit fileCreated(filePath, newInfo.size());
+            emit fileExists(filePath, newInfo.size());
+        }
+        else if (oldExists && !newExists) {
+            files[i] = newInfo;
+            emit fileDeleted(filePath);
+            emit fileNotExists(filePath);
+        }
+        else if (oldExists && newExists) {
+            if (oldInfo.size() != newInfo.size() || oldInfo.lastModified() != newInfo.lastModified()) {
+                files[i] = newInfo;
+                emit fileChanged(filePath, newInfo.size());
+            }
+            emit fileExists(filePath, newInfo.size());
+        }
+        else if (!oldExists && !newExists) {
+            emit fileNotExists(filePath);
+        }
+    }
 }

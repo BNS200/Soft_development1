@@ -17,6 +17,14 @@ int main(int argc, char *argv[])
     // to a.exec() or use the Non-Qt Plain C++ Application template.
 
     fileManager& manager = fileManager::Instance();
+    logger* log = new logger();
+
+    manager.setLogger(log);
+
+    QTimer timer;
+    QObject::connect(&timer, &QTimer::timeout, &manager, &fileManager::updateFiles);
+    timer.start(100);
+
     manager.addFile("/Users/nikitabufalov/work2/Soft_development/Lab1/file1.txt");
     manager.addFile("/Users/nikitabufalov/work2/Soft_development/Lab1/file2.txt");
 

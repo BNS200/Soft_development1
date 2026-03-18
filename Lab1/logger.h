@@ -11,7 +11,7 @@ class logger : public QObject
 {
     Q_OBJECT;
 public:
-    explicit logger(QObject* parent = nullptr);
+    explicit logger(QObject* parent);
 
 public slots:
     void logChanged(const QString& fileName, qint64 size);
