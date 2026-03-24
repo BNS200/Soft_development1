@@ -16,17 +16,26 @@ int main(int argc, char *argv[])
     // If you do not need a running Qt event loop, remove the call
     // to a.exec() or use the Non-Qt Plain C++ Application template.
 
+    // Получение единственного экземпляра менеджера файлов
     fileManager& manager = fileManager::Instance();
-    logger* log = new logger();
 
+    // Создание логгера с привязкой к объекту приложения
+    logger* log = new logger(&a);
+
+    // Установка логгера для менеджера файлов
     manager.setLogger(log);
 
+    // Создание таймера для периодической проверки
     QTimer timer;
     QObject::connect(&timer, &QTimer::timeout, &manager, &fileManager::updateFiles);
-    timer.start(100);
+    timer.start(1000); // Проверка каждые 100 мс
 
-    manager.addFile("/Users/nikitabufalov/work2/Soft_development/Lab1/file1.txt");
-    manager.addFile("/Users/nikitabufalov/work2/Soft_development/Lab1/file2.txt");
 
-    return a.exec();
+
+    manager.addFile("/Users/nikitabufalov/work2/Soft_development/Lab1/my file with spaces.txt");
+    // manager.addFile("/Users/nikitabufalov/work2/Soft_development/Lab1/file2.txt");
+    // manager.addFile("/Users/nikitabufalov/work2/Soft_development/Lab1/file3.txt");
+
+
+    return a.exec();// Запуск цикла обработки событий
 }

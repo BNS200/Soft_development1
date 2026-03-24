@@ -11,9 +11,11 @@ class logger : public QObject
 {
     Q_OBJECT;
 public:
-    explicit logger(QObject* parent);
+    explicit logger(QObject* parent); // Конструктор без приведения типов
 
 public slots:
+
+    // Слоты для обработки различных событий
     void logChanged(const QString& fileName, qint64 size);
     void logDeleted(const QString& fileName);
     void logExists(const QString& fileName, qint64 size);
@@ -21,8 +23,8 @@ public slots:
     void logCreated(const QString& fileName, qint64 size);
 
 private:
-    void print(const QString& message);
-    QString formatSize(qint64 size);
+    void print(const QString& message); // Вывод  в консоль
+    QString formatSize(qint64 size); // Форматирование вывода в консоль
 };
 
 #endif // LOGGER_H
