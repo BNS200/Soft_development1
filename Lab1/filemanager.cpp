@@ -46,11 +46,15 @@ void fileManager::addFile(const QString& filePath)
 
     // Проверка на наличие файла в списке отслеживаемых
     for (int i = 0; i < files.size(); ++i) {
-        if (files[i].filePath() == filePath) {
+        if (files[i].fileInfo.filePath() == filePath) {
             return;
         }
     }
-    files.append(QFileInfo(filePath));
+    TrackedFile newFile;
+    newFile.fileInfo = QFileInfo(filePath);
+    newFile.exists = newFile.fileInfo.exists();
+    files.append(newFile);
+
 }
 
 
@@ -58,7 +62,7 @@ void fileManager::addFile(const QString& filePath)
 void fileManager::removeFile(const QString& filePath)
 {
     for (int i = 0; i < files.size(); ++i) {
-        if (files[i].filePath() == filePath) {
+        if (files[i].fileInfo.filePath() == filePath) {
             files.removeAt(i);
             break;
         }
@@ -71,25 +75,27 @@ void fileManager::updateFiles()
     if (!log)
         return;
     for (int i = 0; i < files.size(); ++i) {
-        QFileInfo oldInfo = files[i];// Сохранение сотсояния файла
-        bool oldExists = oldInfo.exists(); //Проверка существования до проверки
+
+        QFileInfo oldInfo = files[i].fileInfo;
         QString filePath = oldInfo.filePath(); // Сохранение пути
         QFileInfo newInfo(filePath);// Тукущее сотсояние файла
 
-
+        bool oldExists = files[i].exists;// Сохранение сотсояния файла
         bool newExists = newInfo.exists(); //Проверка существования на данный момент
 
 
         // Анализ файла
         if (!oldExists && newExists) // Файл был создан
         {
-            files[i] = newInfo;
+            files[i].fileInfo = newInfo;
+            files[i].exists = true;
             emit fileCreated(filePath, newInfo.size());
             emit fileExists(filePath, newInfo.size());
         }
         else if (oldExists && !newExists) // Файл был удален
         {
-            files[i] = newInfo;
+            files[i].fileInfo = newInfo;
+            files[i].exists = false;
             emit fileDeleted(filePath);
             emit fileNotExists(filePath);
         }
@@ -97,14 +103,14 @@ void fileManager::updateFiles()
         {
             if (oldInfo.size() != newInfo.size() || oldInfo.lastModified() != newInfo.lastModified()) // Поверяем на изменения
             {
-                files[i] = newInfo;
+                files[i].fileInfo = newInfo;
                 emit fileChanged(filePath, newInfo.size());
             }
             emit fileExists(filePath, newInfo.size());
         }
         else if (!oldExists && !newExists) // Файл не существует и раньше не существовал
         {
-            files[i] = newInfo;
+            files[i].fileInfo = newInfo;
             emit fileNotExists(filePath);
         }
     }

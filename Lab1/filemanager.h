@@ -7,6 +7,14 @@
 #include <QTimer>
 #include "logger.h"
 
+
+
+
+struct TrackedFile {
+    QFileInfo fileInfo;
+    bool exists;
+};
+
 class fileManager : public QObject
 {
     Q_OBJECT
@@ -35,7 +43,7 @@ private:
 
 
 
-    QList<QFileInfo> files;// Список отслеживаемых файлов
+    QList<TrackedFile> files;// Список отслеживаемых файлов
     logger* log;// Указатель на логгер
 
 signals:

@@ -32,8 +32,8 @@ int main(int argc, char *argv[])
 
 
 
-    manager.addFile("/Users/nikitabufalov/work2/Soft_development/Lab1/my file with spaces.txt");
-    // manager.addFile("/Users/nikitabufalov/work2/Soft_development/Lab1/file2.txt");
+    manager.addFile("/Users/nikitabufalov/work2/Soft_development/Lab1/file1.txt");
+    manager.addFile("/Users/nikitabufalov/work2/Soft_development/Lab1/file2.txt");
     // manager.addFile("/Users/nikitabufalov/work2/Soft_development/Lab1/file3.txt");
 
 
