@@ -33,6 +33,8 @@ public:
 
     // Установка логгера для обработки событий
     void setLogger(logger* log);
+
+    bool isFirstCheck;
 private:
      // Приватный конструктор для Singleton
     fileManager(QObject* parent = nullptr);
