@@ -1,10 +1,11 @@
 #include "filemanager.h"
 
 // Конструктор (приватный для Singleton)
-fileManager::fileManager(QObject* parent) : QObject(parent), log(nullptr)
+fileManager::fileManager(QObject* parent) : QObject(parent), log(nullptr), isFirstCheck(true)
 {
 
 }
+
 
 fileManager& fileManager::Instance()
 {
@@ -68,50 +69,58 @@ void fileManager::removeFile(const QString& filePath)
         }
     }
 }
-//Проверка состояния файлов
+// Проверка состояния файлов
 void fileManager::updateFiles()
 {
-
     if (!log)
         return;
+
     for (int i = 0; i < files.size(); ++i) {
-
         QFileInfo oldInfo = files[i].fileInfo;
-        QString filePath = oldInfo.filePath(); // Сохранение пути
-        QFileInfo newInfo(filePath);// Тукущее сотсояние файла
+        QString filePath = oldInfo.filePath();
+        QFileInfo newInfo(filePath);
 
-        bool oldExists = files[i].exists;// Сохранение сотсояния файла
-        bool newExists = newInfo.exists(); //Проверка существования на данный момент
+        bool oldExists = files[i].exists;
+        bool newExists = newInfo.exists();
 
+        // При первой проверке выводим начальное состояние
+        if (isFirstCheck) {
+            if (newExists) {
+                emit fileExists(filePath, newInfo.size());
+            } else {
+                emit fileNotExists(filePath);
+            }
+            files[i].fileInfo = newInfo;
+            files[i].exists = newExists;
+        }
 
-        // Анализ файла
+        // Анализ файла - сообщения ТОЛЬКО при реальных изменениях
         if (!oldExists && newExists) // Файл был создан
         {
             files[i].fileInfo = newInfo;
             files[i].exists = true;
             emit fileCreated(filePath, newInfo.size());
-            emit fileExists(filePath, newInfo.size());
         }
         else if (oldExists && !newExists) // Файл был удален
         {
             files[i].fileInfo = newInfo;
             files[i].exists = false;
             emit fileDeleted(filePath);
-            emit fileNotExists(filePath);
         }
-        else if (oldExists && newExists) // Файл существует
+        else if (oldExists && newExists) // Файл изменен
         {
-            if (oldInfo.size() != newInfo.size() || oldInfo.lastModified() != newInfo.lastModified()) // Поверяем на изменения
+
+            if (oldInfo.size() != newInfo.size() ||
+                oldInfo.lastModified() != newInfo.lastModified())
             {
                 files[i].fileInfo = newInfo;
                 emit fileChanged(filePath, newInfo.size());
             }
-            emit fileExists(filePath, newInfo.size());
         }
-        else if (!oldExists && !newExists) // Файл не существует и раньше не существовал
-        {
-            files[i].fileInfo = newInfo;
-            emit fileNotExists(filePath);
-        }
+    }
+
+    // После первой проверки сбрасываем флаг
+    if (isFirstCheck) {
+        isFirstCheck = false;
     }
 }
