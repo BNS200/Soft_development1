@@ -7,23 +7,23 @@ logger::logger(QObject* parent) : QObject(parent){
 }
 // Логирование изменения файла
 void logger::logChanged(const QString& fileName, qint64 size){
-    print(QString("Файл '%1' изменен, размер '%2'").arg(fileName).arg(formatSize(size)));
+    print(QString("File '%1' changed, size '%2'").arg(fileName).arg(formatSize(size)));
 }
 // Логирование удаления файла
 void logger::logDeleted(const QString& fileName){
-    print(QString("Файл '%1' удален").arg(fileName));
+    print(QString("File '%1' deleted").arg(fileName));
 }
 //Логирование существования файла
 void logger::logExists(const QString& fileName, qint64 size){
-    print(QString("Файл '%1' существует, размер '%2'").arg(fileName).arg(formatSize(size)));
+    print(QString("File '%1' exists, size '%2'").arg(fileName).arg(formatSize(size)));
 }
 // Логирование отсутствия файла
 void logger::logNotExists(const QString& fileName){
-    print(QString("Файл '%1' не существует").arg(fileName));
+    print(QString("File '%1' not exists").arg(fileName));
 }
 
 void logger::logCreated(const QString& fileName, qint64 size){
-    print(QString("Файл '%1' создан, размер '%2'").arg(fileName).arg(formatSize(size)));
+    print(QString("File '%1' created, size '%2'").arg(fileName).arg(formatSize(size)));
 
 }
 // Вывод сообщения в консоль
